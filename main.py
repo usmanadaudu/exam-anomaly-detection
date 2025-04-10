@@ -6,8 +6,6 @@ run = st.checkbox('Run')
 FRAME_WINDOW = st.image([])
 # camera = st.camera_input("Cheking camera input", disabled=not run)
 
-camera = cv2.VideoCapture(1)
-
 while run:
     for i in range(5):
         camera = cv2.VideoCapture(i)
