@@ -22,5 +22,7 @@ while run:
 
         # Show frame in webapp
         FRAME_WINDOW.image(frame)
+    else:
+        st.write("Camera returned no frame...")
 else:
     st.write('Stopped')
