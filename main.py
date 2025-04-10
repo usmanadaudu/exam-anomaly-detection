@@ -4,7 +4,8 @@ import streamlit as st
 st.title("Webcam Live Feed")
 run = st.checkbox('Run')
 FRAME_WINDOW = st.image([])
-camera = cv2.VideoCapture(1)
+# camera = cv2.VideoCapture(1)
+camera = st.camera_input("Cheking camera input", disabled=not run)
 
 while run:
     while camera.isOpened():
