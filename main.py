@@ -31,13 +31,49 @@
 #     st.write('Stopped')
 
 from streamlit_webrtc import webrtc_streamer
+import mediapipe as mp
+import cv2
 import av
 
-def frame_callback(frame):
+# resize frames to HD while maintaining aspect ratio
+resize = True
 
-    image = frame.to_ndarray(format="bgr24")
+# Set max width and height
+MAX_WIDTH = 1280
+MAX_HEIGHT = 720
 
-    flipped = image[:, ::-1, :]
-    return av.VideoFrame.from_ndarray(flipped, format="bgr24")
+# Set maximum number of faces to track
+num_faces = 5
+
+# Initialize MediaPipe pose and face mesh models
+mp_pose = mp.solutions.pose
+pose = mp_pose.Pose()
+mp_face_mesh = mp.solutions.face_mesh
+face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=num_faces)
+
+def frame_callback(image):
+
+    frame = image.to_ndarray(format="bgr24")
+    
+    # Flip webcam feed horizontally
+    frame = frame[:, ::-1, :]
+
+    # Get frame shape
+    h, w, _ = frame.shape
+
+    if resize:
+        # Get new domension while maintaining aspect ratio
+        scale = min(MAX_WIDTH / w, MAX_HEIGHT / h)
+        new_w = int(w * scale)
+        new_h = int(h * scale)
+
+        # Resize frame
+        frame = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_AREA)
+    
+        # Get new frame shape
+        h, w, _ = frame.shape
+
+
+    return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 webrtc_streamer(key="webcam_footages", video_frame_callback=frame_callback)
