@@ -38,6 +38,6 @@ def frame_callback(frame):
     image = frame.to_ndarray(format="bgr24")
 
     flipped = image[:, ::-1, :]
-    return av.VideoFrame.from_ndarray(frame, format="bgr24")
+    return av.VideoFrame.from_ndarray(flipped, format="bgr24")
 
 webrtc_streamer(key="webcam_footages", video_frame_callback=frame_callback)
