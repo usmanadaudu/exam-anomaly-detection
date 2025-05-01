@@ -46,19 +46,23 @@ MAX_HEIGHT = 720
 num_faces = 5
 
 # Initialize MediaPipe pose and face mesh models
-mp_pose = mp.solutions.pose
-pose = mp_pose.Pose()
-mp_face_mesh = mp.solutions.face_mesh
-face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=num_faces)
+# mp_pose = mp.solutions.pose
+pose = mp.solutions.pose.Pose()
+# mp_face_mesh = mp.solutions.face_mesh
+face_mesh = mp.solutions.face_mesh.FaceMesh(static_image_mode=False, max_num_faces=num_faces)
 
 def frame_callback(image):
+
+    print("Callback started")
 
     frame = image.to_ndarray(format="bgr24")
     
     # Flip webcam feed horizontally
-    frame = frame[:, ::-1, :]
+    frame = cv2.flip(frame, 1)
 
-    # Get frame shape
+    print("Image flipped")
+
+    # # Get frame shape
     h, w, _ = frame.shape
 
     if resize:
@@ -80,6 +84,7 @@ def frame_callback(image):
     faces = face_mesh.process(rgb_img)
 
     if faces.multi_face_landmarks:
+        print("face landmarks found")
         for face in faces.multi_face_landmarks:
             face_landmark = face.landmark
 
@@ -95,61 +100,72 @@ def frame_callback(image):
             pose_x2 = int(min(w, x2 + 0.2*w))
             pose_y2 = int(min(h, y2 + 0.5*h))
 
+            print(pose_x1, pose_x2, pose_y1, pose_y2)
+
             rgb_img.flags.writeable = False
 
-            # Get pose landmarks of the current person
-            pose = pose.process(rgb_img[pose_y1:pose_y2, pose_x1:pose_x2])
+            print(rgb_img.shape)
+            print(rgb_img[pose_y1:pose_y2, pose_x1:pose_x2, :].shape)
+            print(rgb_img[pose_y1:pose_y2, pose_x1:pose_x2].shape)
 
-            frame.flags.writeable = True
+            # # Get pose landmarks of the current person
+            # pose_result = pose.process(rgb_img[pose_y1:pose_y2, pose_x1:pose_x2, :])
 
-            if pose.pose_landmarks:
-                pose_landmark = pose.pose_landmarks.landmark
+            # print("extracted pose 1")
 
-                nose = pose_landmark[mp_pose.PoseLandmark.NOSE]
-                left_shoulder = pose_landmark[mp_pose.PoseLandmark.LEFT_SHOULDER]
-                right_shoulder = pose_landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER]
+            # # frame.flags.writeable = True
 
-                shoulder_center_x = (left_shoulder.x + right_shoulder.x) / 2
-                shoulder_center_y = (left_shoulder.y + right_shoulder.y) / 2
+            # print("extracted pose 2")
+
+            # if pose_result.pose_landmarks:
+            #     print("Pose result found")
+    #             pose_landmark = pose_result.pose_landmarks.landmark
+
+    #             nose = pose_landmark[mp_pose.PoseLandmark.NOSE]
+    #             left_shoulder = pose_landmark[mp_pose.PoseLandmark.LEFT_SHOULDER]
+    #             right_shoulder = pose_landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER]
+
+    #             shoulder_center_x = (left_shoulder.x + right_shoulder.x) / 2
+    #             shoulder_center_y = (left_shoulder.y + right_shoulder.y) / 2
                 
-                anomaly = False
+    #             anomaly = False
 
-                # Horizontal movement (Left/Right)
-                hor_orient = (nose.x - shoulder_center_x) / nose.z
-                if hor_orient > 0.03:
-                    hor_dir = "Left"
-                    anomaly = True
-                elif hor_orient < -0.03:
-                    hor_dir = "Right"
-                    anomaly = True
-                else:
-                    hor_orient = ""
+    #             # Horizontal movement (Left/Right)
+    #             hor_orient = (nose.x - shoulder_center_x) / nose.z
+    #             if hor_orient > 0.03:
+    #                 hor_dir = "Left"
+    #                 anomaly = True
+    #             elif hor_orient < -0.03:
+    #                 hor_dir = "Right"
+    #                 anomaly = True
+    #             else:
+    #                 hor_orient = ""
                     
-                # Check for speech
-                lips_movement = (face_landmark[15].y - face_landmark[13].y) / abs(nose.z)
-                if lips_movement > 0.007:
-                    speech = "Talking"
-                    anomaly = True
-                else:
-                    speech = ""
+    #             # Check for speech
+    #             lips_movement = (face_landmark[15].y - face_landmark[13].y) / abs(nose.z)
+    #             if lips_movement > 0.007:
+    #                 speech = "Talking"
+    #                 anomaly = True
+    #             else:
+    #                 speech = ""
 
-            # Pick box color based on anomalt detection
-            if anomaly:
-                color = (0, 0, 255)
-            else:
-                color = (0, 255, 0)
+    #         # Pick box color based on anomalt detection
+    #         if anomaly:
+    #             color = (0, 0, 255)
+    #         else:
+    #             color = (0, 255, 0)
 
-            # Draw face rectangle
-            cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+    #         # Draw face rectangle
+    #         cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
 
             
-            cv2.putText(frame, f"{hor_dir} | {speech}", (x1, y1 - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+    #         cv2.putText(frame, f"{hor_dir} | {speech}", (x1, y1 - 10),
+    #                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
             
-            # Show cropped image per person
-            cv2.rectangle(frame, (pose_x1, pose_y1), (pose_x2, pose_y2), (0, 255, 255), 2)
+    #         # Show cropped image per person
+    #         cv2.rectangle(frame, (pose_x1, pose_y1), (pose_x2, pose_y2), (0, 255, 255), 2)
 
-    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+    frame = cv2.cvtColor(rgb_img, cv2.COLOR_RGB2BGR)
 
     return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
