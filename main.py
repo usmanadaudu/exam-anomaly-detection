@@ -31,5 +31,9 @@
 #     st.write('Stopped')
 
 from streamlit_webrtc import webrtc_streamer
+import av
 
-webrtc_streamer(key="key")
+def frame_callback(frame):
+    return av.VideoFrame.from_ndarray(frame, format="bgr24")
+
+webrtc_streamer(key="webcam_footages", video_frame_callback=frame_callback)
