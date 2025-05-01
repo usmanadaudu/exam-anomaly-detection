@@ -73,7 +73,6 @@ def frame_callback(image):
         # Get new frame shape
         h, w, _ = frame.shape
 
-
     return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 webrtc_streamer(key="webcam_footages", video_frame_callback=frame_callback)
