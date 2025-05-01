@@ -34,6 +34,10 @@ from streamlit_webrtc import webrtc_streamer
 import av
 
 def frame_callback(frame):
+
+    image = frame.to_ndarray(format="bgr24")
+
+    flipped = image[:, ::-1, :]
     return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 webrtc_streamer(key="webcam_footages", video_frame_callback=frame_callback)
