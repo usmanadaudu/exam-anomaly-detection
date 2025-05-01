@@ -73,6 +73,84 @@ def frame_callback(image):
         # Get new frame shape
         h, w, _ = frame.shape
 
+    rgb_img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    rgb_img.flags.writeable = False
+
+    # Extract faces and facial landmarks
+    faces = face_mesh.process(rgb_img)
+
+    if faces.multi_face_landmarks:
+        for face in faces.multi_face_landmarks:
+            face_landmark = face.landmark
+
+            # Get boundary coordinates of facial landmarks
+            x1 = int(min([facial_point.x for facial_point in face_landmark]) * w)
+            x2 = int(max([facial_point.x for facial_point in face_landmark]) * w)
+            y1 = int(min([facial_point.y for facial_point in face_landmark]) * h)
+            y2 = int(max([facial_point.y for facial_point in face_landmark]) * h)
+
+            # Crop out current person
+            pose_x1 = int(max(0, x1 - 0.2*w))
+            pose_y1 = int(max(0, y1 - 0.15*h))
+            pose_x2 = int(min(w, x2 + 0.2*w))
+            pose_y2 = int(min(h, y2 + 0.5*h))
+
+            rgb_img.flags.writeable = False
+
+            # Get pose landmarks of the current person
+            pose = pose.process(rgb_img[pose_y1:pose_y2, pose_x1:pose_x2])
+
+            frame.flags.writeable = True
+
+            if pose.pose_landmarks:
+                pose_landmark = pose.pose_landmarks.landmark
+
+                nose = pose_landmark[mp_pose.PoseLandmark.NOSE]
+                left_shoulder = pose_landmark[mp_pose.PoseLandmark.LEFT_SHOULDER]
+                right_shoulder = pose_landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER]
+
+                shoulder_center_x = (left_shoulder.x + right_shoulder.x) / 2
+                shoulder_center_y = (left_shoulder.y + right_shoulder.y) / 2
+                
+                anomaly = False
+
+                # Horizontal movement (Left/Right)
+                hor_orient = (nose.x - shoulder_center_x) / nose.z
+                if hor_orient > 0.03:
+                    hor_dir = "Left"
+                    anomaly = True
+                elif hor_orient < -0.03:
+                    hor_dir = "Right"
+                    anomaly = True
+                else:
+                    hor_orient = ""
+                    
+                # Check for speech
+                lips_movement = (face_landmark[15].y - face_landmark[13].y) / abs(nose.z)
+                if lips_movement > 0.007:
+                    speech = "Talking"
+                    anomaly = True
+                else:
+                    speech = ""
+
+            # Pick box color based on anomalt detection
+            if anomaly:
+                color = (0, 0, 255)
+            else:
+                color = (0, 255, 0)
+
+            # Draw face rectangle
+            cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+
+            
+            cv2.putText(frame, f"{hor_dir} | {speech}", (x1, y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            
+            # Show cropped image per person
+            cv2.rectangle(frame, (pose_x1, pose_y1), (pose_x2, pose_y2), (0, 255, 255), 2)
+
+    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
     return av.VideoFrame.from_ndarray(frame, format="bgr24")
 
 webrtc_streamer(key="webcam_footages", video_frame_callback=frame_callback)
