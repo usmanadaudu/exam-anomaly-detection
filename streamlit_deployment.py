@@ -103,7 +103,7 @@ def frame_callback(image):
 
             print(pose_x1, pose_x2, pose_y1, pose_y2)
 
-            rgb_img.flags.writeable = False
+            rgb_img.flags.writeable = True
 
             print(rgb_img.shape)
             print(rgb_img[pose_y1:pose_y2, pose_x1:pose_x2, :].shape)
@@ -112,7 +112,7 @@ def frame_callback(image):
 
             person_crop = rgb_img[pose_y1:pose_y2, pose_x1:pose_x2, :]
 
-            person_crop.flags.writeable = False
+            # person_crop.flags.writeable = False
 
             # # Get pose landmarks of the current person
             # pose_result = pose.process(rgb_img[pose_y1:pose_y2, pose_x1:pose_x2, :])
@@ -120,7 +120,7 @@ def frame_callback(image):
 
             # print("extracted pose 1")
 
-            rgb_img.flags.writeable = True
+            # rgb_img.flags.writeable = True
 
             # print("extracted pose 2")
 
