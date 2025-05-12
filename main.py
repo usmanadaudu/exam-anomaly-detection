@@ -38,8 +38,9 @@ if resize:
     h, w, _ = frame.shape
 
 # Initiate VideoWriter
-video_writer = cv2.VideoWriter("processed_footage.avi", 
-                               -1, 10, (w, h))
+video_writer = cv2.VideoWriter("processed_footage.mp4", 
+                               cv2.VideoWriter_fourcc(*"MP4V"),
+                               10, (w, h))
 
 while cap.isOpened():
     ret, frame = cap.read()
