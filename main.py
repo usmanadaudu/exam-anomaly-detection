@@ -107,13 +107,19 @@ def frame_callback(image):
             print(rgb_img.shape)
             print(rgb_img[pose_y1:pose_y2, pose_x1:pose_x2, :].shape)
             print(rgb_img[pose_y1:pose_y2, pose_x1:pose_x2].shape)
+            print(type(rgb_img))
+
+            person_crop = rgb_img[pose_y1:pose_y2, pose_x1:pose_x2, :]
+
+            person_crop.flags.writeable = False
 
             # # Get pose landmarks of the current person
             # pose_result = pose.process(rgb_img[pose_y1:pose_y2, pose_x1:pose_x2, :])
+            pose_result = pose.process(person_crop)
 
             # print("extracted pose 1")
 
-            # # frame.flags.writeable = True
+            rgb_img.flags.writeable = True
 
             # print("extracted pose 2")
 
@@ -155,15 +161,15 @@ def frame_callback(image):
     #         else:
     #             color = (0, 255, 0)
 
-    #         # Draw face rectangle
-    #         cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+            # Draw face rectangle
+            cv2.rectangle(rgb_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
             
     #         cv2.putText(frame, f"{hor_dir} | {speech}", (x1, y1 - 10),
     #                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
             
-    #         # Show cropped image per person
-    #         cv2.rectangle(frame, (pose_x1, pose_y1), (pose_x2, pose_y2), (0, 255, 255), 2)
+            # Show cropped image per person
+            cv2.rectangle(rgb_img, (pose_x1, pose_y1), (pose_x2, pose_y2), (0, 255, 255), 2)
 
     frame = cv2.cvtColor(rgb_img, cv2.COLOR_RGB2BGR)
 
