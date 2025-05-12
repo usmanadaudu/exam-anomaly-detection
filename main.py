@@ -16,12 +16,37 @@ MAX_HEIGHT = 720
 
 # Webcam feed
 cap = cv2.VideoCapture(0)
+
+ret, frame = cap.read()
+
+# Flip for selfie mode and convert to RGB
+frame = cv2.flip(frame, 1)
+
+# Get frame shape
+h, w, _ = frame.shape
+        
+if resize:
+    # Get new domension while maintaining aspect ratio
+    scale = min(MAX_WIDTH / w, MAX_HEIGHT / h)
+    new_w = int(w * scale)
+    new_h = int(h * scale)
+
+    # Resize frame
+    frame = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
+    # Get new frame shape
+    h, w, _ = frame.shape
+
+# Initiate VideoWriter
+video_writer = cv2.VideoWriter("processed_footage.avi", 
+                               -1, 10, (w, h))
+
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
         
-#     # Flip for selfie mode and convert to RGB
+    # Flip for selfie mode and convert to RGB
     frame = cv2.flip(frame, 1)
     
     # Get frame shape
@@ -110,6 +135,9 @@ while cap.isOpened():
             cv2.putText(frame, f"{hor_dir} | {speech}", (x1, y1 - 10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
+    # add frame to video output
+    video_writer.write(frame)
+    
     # Show result
     cv2.imshow("Examination Anomaly Detection", frame)
 
@@ -117,4 +145,5 @@ while cap.isOpened():
         break
 
 cap.release()
+video_writer.release()
 cv2.destroyAllWindows()
