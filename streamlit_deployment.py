@@ -124,9 +124,9 @@ def frame_callback(image):
 
             # print("extracted pose 2")
 
-            # if pose_result.pose_landmarks:
-            #     print("Pose result found")
-    #             pose_landmark = pose_result.pose_landmarks.landmark
+            if pose_result.pose_landmarks:
+                print("Pose result found")
+                pose_landmark = pose_result.pose_landmarks.landmark
 
     #             nose = pose_landmark[mp_pose.PoseLandmark.NOSE]
     #             left_shoulder = pose_landmark[mp_pose.PoseLandmark.LEFT_SHOULDER]
