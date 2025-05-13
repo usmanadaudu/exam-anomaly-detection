@@ -21,15 +21,10 @@ pose = mp.solutions.pose.Pose()
 face_mesh = mp.solutions.face_mesh.FaceMesh(static_image_mode=False, max_num_faces=num_faces)
 
 def frame_callback(image):
-
-    print("Callback started")
-
     frame = image.to_ndarray(format="bgr24")
     
     # Flip webcam feed horizontally
     frame = cv2.flip(frame, 1)
-
-    print("Image flipped")
 
     # # Get frame shape
     h, w, _ = frame.shape
@@ -53,7 +48,6 @@ def frame_callback(image):
     faces = face_mesh.process(rgb_img)
 
     if faces.multi_face_landmarks:
-        print("face landmarks found")
         for face in faces.multi_face_landmarks:
             face_landmark = face.landmark
 
@@ -69,21 +63,13 @@ def frame_callback(image):
             pose_x2 = int(min(w, x2 + 0.2*w))
             pose_y2 = int(min(h, y2 + 0.5*h))
 
-            print(pose_x1, pose_x2, pose_y1, pose_y2)
-
             rgb_img.flags.writeable = True
-
-            print(rgb_img.shape)
-            print(rgb_img[pose_y1:pose_y2, pose_x1:pose_x2, :].shape)
-            print(rgb_img[pose_y1:pose_y2, pose_x1:pose_x2].shape)
-            print(type(rgb_img))
 
             person_crop = rgb_img[pose_y1:pose_y2, pose_x1:pose_x2, :]
 
             # person_crop.flags.writeable = False
 
-            # # Get pose landmarks of the current person
-            # pose_result = pose.process(rgb_img[pose_y1:pose_y2, pose_x1:pose_x2, :])
+            # Get pose landmarks of the current person
             pose_result = pose.process(person_crop)
 
             # print("extracted pose 1")
@@ -97,7 +83,6 @@ def frame_callback(image):
             hor_dir = ""
 
             if pose_result.pose_landmarks:
-                print("Pose result found")
                 pose_landmark = pose_result.pose_landmarks.landmark
 
                 nose = pose_landmark[pose.PoseLandmark.NOSE]
