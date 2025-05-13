@@ -16,8 +16,8 @@ with open("coco.names", "r") as f:
 net = cv2.dnn.readNet("yolov4-tiny.weights", "yolov4-tiny.cfg")
 
 # Use CPU
-net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
-net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+# net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
+# net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
 
 # Get YOLOv4-tiny output layer names
 layer_names = net.getLayerNames()
@@ -223,14 +223,13 @@ while cap.isOpened():
     # Flip for selfie mode
     frame_copy = cv2.flip(frame_copy, 1)
 
-     # add bounding box and anomaly info for detected people
+     # add bounding box and anomaly info for detected people in streaming video
     for x1, y1, x2, y2, color, hor_dir, speech in zip(person["x1"], person["y1"], person["x2"], person["y2"],
                                                       person["color"], person["hor_dir"], person["speech"]):
-        # Add text to face box
         cv2.putText(frame_copy, f"{hor_dir} | {speech}", (w - x2, y1 - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
         
-    # add bounding box to detected phones
+    # add bounding box to detected phones in streaming video
     for phone_x, phone_y, phone_w, phone_h in zip(phone["x"], phone["y"], phone["width"], phone["height"]):
         cv2.putText(frame_copy, "Phone", (w - phone_x - phone_w, phone_y - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
