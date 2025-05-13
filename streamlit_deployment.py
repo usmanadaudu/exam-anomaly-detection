@@ -1,35 +1,3 @@
-# import cv2
-# import streamlit as st
-
-# st.title("Webcam Live Feed")
-# run = st.checkbox('Run')
-# FRAME_WINDOW = st.image([])
-# # camera = st.camera_input("Cheking camera input", disabled=not run)
-
-# while run:
-#     for i in range(1):
-#         camera = cv2.VideoCapture(i)
-#         if camera.isOpened():
-#             print(f"Input {i} is a valid camera value for VIDEO_SOURCE")
-#             ret, frame = camera.read()
-
-#             # Do nothing when camera frame cannot be read
-#             if not ret:
-#                 break
-
-#             # Flip the frame to show live cam properly
-#             frame = cv2.flip(frame, 1)
-
-#             # Convert frame from BGR to RGB
-#             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-#             # Show frame in webapp
-#             FRAME_WINDOW.image(frame)
-#         else:
-#             st.write("Camera returned no frame...")
-# else:
-#     st.write('Stopped')
-
 import streamlit as st
 from streamlit_webrtc import webrtc_streamer
 import mediapipe as mp
@@ -124,50 +92,52 @@ def frame_callback(image):
 
             # print("extracted pose 2")
 
+            anomaly = False
+            speech = ""
+            hor_dir = ""
+
             if pose_result.pose_landmarks:
                 print("Pose result found")
                 pose_landmark = pose_result.pose_landmarks.landmark
 
-    #             nose = pose_landmark[mp_pose.PoseLandmark.NOSE]
-    #             left_shoulder = pose_landmark[mp_pose.PoseLandmark.LEFT_SHOULDER]
-    #             right_shoulder = pose_landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER]
+                nose = pose_landmark[pose.PoseLandmark.NOSE]
+                left_shoulder = pose_landmark[pose.PoseLandmark.LEFT_SHOULDER]
+                right_shoulder = pose_landmark[pose.PoseLandmark.RIGHT_SHOULDER]
 
-    #             shoulder_center_x = (left_shoulder.x + right_shoulder.x) / 2
-    #             shoulder_center_y = (left_shoulder.y + right_shoulder.y) / 2
-                
-    #             anomaly = False
+                shoulder_center_x = (left_shoulder.x + right_shoulder.x) / 2
+                shoulder_center_y = (left_shoulder.y + right_shoulder.y) / 2
 
-    #             # Horizontal movement (Left/Right)
-    #             hor_orient = (nose.x - shoulder_center_x) / nose.z
-    #             if hor_orient > 0.03:
-    #                 hor_dir = "Left"
-    #                 anomaly = True
-    #             elif hor_orient < -0.03:
-    #                 hor_dir = "Right"
-    #                 anomaly = True
-    #             else:
-    #                 hor_orient = ""
+                # Horizontal movement (Left/Right)
+                hor_orient = (nose.x - shoulder_center_x) / nose.z
+                if hor_orient > 0.03:
+                    hor_dir = "Left"
+                    anomaly = True
+                elif hor_orient < -0.03:
+                    hor_dir = "Right"
+                    anomaly = True
+                else:
+                    hor_dir = ""
                     
-    #             # Check for speech
-    #             lips_movement = (face_landmark[15].y - face_landmark[13].y) / abs(nose.z)
-    #             if lips_movement > 0.007:
-    #                 speech = "Talking"
-    #                 anomaly = True
-    #             else:
-    #                 speech = ""
+                # Check for speech
+                lips_movement = (face_landmark[15].y - face_landmark[13].y) / abs(nose.z)
+                if lips_movement > 0.007:
+                    speech = "Talking"
+                    anomaly = True
+                else:
+                    speech = ""
 
-    #         # Pick box color based on anomalt detection
-    #         if anomaly:
-    #             color = (0, 0, 255)
-    #         else:
-    #             color = (0, 255, 0)
+            # Pick box color based on anomalt detection
+            if anomaly:
+                color = (0, 0, 255)
+            else:
+                color = (0, 255, 0)
 
             # Draw face rectangle
             cv2.rectangle(rgb_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
             
-    #         cv2.putText(frame, f"{hor_dir} | {speech}", (x1, y1 - 10),
-    #                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            cv2.putText(frame, f"{hor_dir} | {speech}", (x1, y1 - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
             
             # Show cropped image per person
             cv2.rectangle(rgb_img, (pose_x1, pose_y1), (pose_x2, pose_y2), (0, 255, 255), 2)
