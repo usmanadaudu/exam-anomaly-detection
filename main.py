@@ -15,7 +15,7 @@ MAX_WIDTH = 1280
 MAX_HEIGHT = 720
 
 # Webcam feed
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 ret, frame = cap.read()
 
@@ -119,7 +119,7 @@ while cap.isOpened():
                     
                 # Check for speech
                 lips_movement = (lms[15].y - lms[13].y) / abs(nose.z)
-                if lips_movement > 0.015:
+                if lips_movement > 0.011:
                     speech = "Talking"
                     anomaly = True
                 else:
