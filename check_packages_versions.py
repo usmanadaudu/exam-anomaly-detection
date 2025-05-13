@@ -1,6 +1,3 @@
-import streamlit as st
-print(st.__version__)
-
 import streamlit_webrtc
 print(streamlit_webrtc.__version__)
 
