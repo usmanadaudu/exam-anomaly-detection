@@ -1,14 +1,14 @@
 import streamlit_webrtc
-print(streamlit_webrtc.__version__)
+print("streamlit_webrtc:", streamlit_webrtc.__version__)
 
 import cv2
-print(cv2.__version__)
+print("cv2:",cv2.__version__)
 
 import numpy as np
-print(np.__version__)
+print("numpy:", np.__version__)
 
 import mediapipe as mp
-print(mp.__version__)
+print("mediapipe:", mp.__version__)
 
 import av
-print(av.__version__)
+print("av:", av.__version__)
