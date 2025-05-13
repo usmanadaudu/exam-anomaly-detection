@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 import mediapipe as mp
 
 # Initialize MediaPipe pose and face mesh models
@@ -6,6 +7,21 @@ mp_pose = mp.solutions.pose
 pose = mp_pose.Pose()
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=5)
+
+# Load YOLOv4-tiny class names
+with open("coco.names", "r") as f:
+    class_names = [line.strip() for line in f.readlines()]
+
+# Load YOLOv4-tiny model
+net = cv2.dnn.readNet("yolov4-tiny.weights", "yolov4-tiny.cfg")
+
+# Use CPU
+net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
+net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+
+# Get YOLOv4-tiny output layer names
+layer_names = net.getLayerNames()
+output_layers = [layer_names[i - 1] for i in net.getUnconnectedOutLayers().flatten()]
 
 # resize frames to HD while maintaining aspect ratio
 resize = True
@@ -15,12 +31,12 @@ MAX_WIDTH = 1280
 MAX_HEIGHT = 720
 
 # Webcam feed
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 ret, frame = cap.read()
 
 # Flip for selfie mode and convert to RGB
-frame = cv2.flip(frame, 1)
+# frame = cv2.flip(frame, 1)
 
 # Get frame shape
 h, w, _ = frame.shape
@@ -46,9 +62,6 @@ while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
-        
-    # Flip for selfie mode and convert to RGB
-    frame = cv2.flip(frame, 1)
     
     # Get frame shape
     h, w, _ = frame.shape
@@ -64,6 +77,31 @@ while cap.isOpened():
     
         # Get new frame shape
         h, w, _ = frame.shape
+
+    # Create a blob from input frame
+    blob = cv2.dnn.blobFromImage(frame, 1/255.0, (416, 416), swapRB=True, crop=False)
+    net.setInput(blob)
+    outputs = net.forward(output_layers)
+
+    # create variables to hold bounding box info for phones detected
+    phone = {"x": [], "y": [], "width": [], "height": []}
+
+    # Loop over detections
+    for output in outputs:
+        for detection in output:
+            scores = detection[5:]
+            class_id = np.argmax(scores)
+            confidence = scores[class_id]
+
+            # Look for "cell phone" class
+            if class_names[class_id] == "cell phone" and confidence > 0.5:
+                center_x = int(detection[0] * w)
+                center_y = int(detection[1] * h)
+                phone["width"].append(int(detection[2] * w))
+                phone["height"].append(int(detection[3] * h))
+
+                phone["x"].append(int(center_x - phone["width"][-1] / 2))
+                phone["y"].append(int(center_y - phone["height"][-1] / 2))
     
     # Convert frame from BGR to RGB
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -73,6 +111,11 @@ while cap.isOpened():
 
     hor_dir = "Forward"  # Default horizontal direction
     vert_dir = "Forward" # Default vertical direction
+
+    # create varibles to hold bounding box and anomaly info for detected faces
+    person = {"x1": [], "x2": [], "y1": [], "y2": [],
+              "hor_dir": [], "speech": [], "color": []
+             }
 
     # ---- FACE BOX LOGIC (FACEMESH) ----
     if face_results.multi_face_landmarks:
@@ -131,16 +174,69 @@ while cap.isOpened():
             else:
                 color = (0, 255, 0)
 
-            # Draw face rectangle
-            cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
-            cv2.putText(frame, f"{hor_dir} | {speech}", (x1, y1 - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            # add box and anomaly info for the current person
+            person["x1"].append(x1)
+            person["x2"].append(x2)
+            person["y1"].append(y1)
+            person["y2"].append(y2)
+            person["color"].append(color)
+            person["hor_dir"].append(hor_dir)
+            person["speech"].append(speech)
 
+            # Draw face rectangle
+            # cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+            # cv2.putText(frame, f"{hor_dir} | {speech}", (x1, y1 - 10),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            
+    # create a flipped version of frame
+    frame_copy = frame.copy()
+
+    # add bounding box and anomaly info for detected people
+    for x1, y1, x2, y2, color, hor_dir, speech in zip(person["x1"], person["y1"], person["x2"], person["y2"],
+                                                      person["color"], person["hor_dir"], person["speech"]):
+        # Draw face rectangle (face box)
+        cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+
+        # Draw face rectangle (face box)
+        cv2.rectangle(frame_copy, (x1, y1), (x2, y2), color, 2)
+
+        # Add text to face box
+        cv2.putText(frame, f"{hor_dir} | {speech}", (x1, y1 - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+
+    # add bounding box to detected phones
+    for phone_x, phone_y, phone_w, phone_h in zip(phone["x"], phone["y"], phone["width"], phone["height"]):
+        cv2.rectangle(frame,(phone_x, phone_y),
+                      (phone_x + phone_w, phone_y + phone_h),
+                      (0, 0, 255), 2)
+        
+        cv2.rectangle(frame_copy,(phone_x, phone_y),
+                      (phone_x + phone_w, phone_y + phone_h),
+                      (0, 0, 255), 2)
+
+        cv2.putText(frame, "Phone", (phone_x, phone_y - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+    
     # add frame to video output
     video_writer.write(frame)
+
+    # Flip for selfie mode
+    frame_copy = cv2.flip(frame_copy, 1)
+
+     # add bounding box and anomaly info for detected people
+    for x1, y1, x2, y2, color, hor_dir, speech in zip(person["x1"], person["y1"], person["x2"], person["y2"],
+                                                      person["color"], person["hor_dir"], person["speech"]):
+        # Add text to face box
+        cv2.putText(frame_copy, f"{hor_dir} | {speech}", (w - x2, y1 - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+        
+    # add bounding box to detected phones
+    for phone_x, phone_y, phone_w, phone_h in zip(phone["x"], phone["y"], phone["width"], phone["height"]):
+        cv2.putText(frame_copy, "Phone", (w - phone_x - phone_w, phone_y - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
     
     # Show result
-    cv2.imshow("Examination Anomaly Detection", frame)
+    cv2.imshow("Examination Anomaly Detection", frame_copy)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
