@@ -31,9 +31,12 @@ MAX_WIDTH = 1280
 MAX_HEIGHT = 720
 
 # Webcam feed
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 ret, frame = cap.read()
+
+if not ret:
+    raise Exception("Unable to connect to camera")
 
 # Flip for selfie mode and convert to RGB
 # frame = cv2.flip(frame, 1)
@@ -152,17 +155,17 @@ while cap.isOpened():
                 # Horizontal movement (Left/Right)
                 hor_orient = (nose.x - shoulder_center_x) / nose.z
                 if hor_orient > 0.03:
-                    hor_dir = "Left"
+                    hor_dir = "Right"
                     anomaly = True
                 elif hor_orient < -0.03:
-                    hor_dir = "Right"
+                    hor_dir = "Left"
                     anomaly = True
                 else:
                     hor_orient = ""
                     
                 # Check for speech
                 lips_movement = (lms[15].y - lms[13].y) / abs(nose.z)
-                if lips_movement > 0.011:
+                if lips_movement > 0.014:
                     speech = "Talking"
                     anomaly = True
                 else:
