@@ -64,7 +64,7 @@ A real-time analyzed video feed will be displayed. The live feed will be a mirro
 ### 📹 Recorded footage
 The processed footages will be saved as a video named `processed_footage.mp4` in the main directory. The saved video will be a non-mirrored version.
 
-## 📊 Sample Output
+### 📊 Sample Output
 
 > ![Sample Output](Images/sample_output.jpg)
 
