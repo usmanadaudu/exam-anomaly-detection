@@ -1,4 +1,4 @@
-# 🕵️‍♂️ Examination Proctoring Aid System
+# 🕵️‍♂️ Examination Proctoring Aid
 
 A light-weight proctoring system based on computer vision to detect anomalies during examinations. The system uses facial landmark tracking (MediaPipe), head pose estimation (MediaPipe) and object detection (YOLO) to monitorstudent behaviour and flag anomalous activities like:
 
@@ -35,7 +35,7 @@ Make sure you have Git and Python 3.7+ installed and set up.
 To get started with this project on your local machine, run:
 
 ```bash
-git https://github.com/usmanadaudu/exam-anomaly-detection.git
+git clone https://github.com/usmanadaudu/exam-anomaly-detection.git
 cd exam-anomaly-detection
 ```
 
