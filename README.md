@@ -67,3 +67,18 @@ The processed footages will be saved as a video named `processed_footage.mp4` in
 ## 📊 Sample Output
 
 > ![Sample Output](Images/sample_output.jpg)
+
+---
+
+## 🔒 Disclaimer
+
+This tool is a **proof of concept** and should not be considered a fully secure proctoring solution. It is meant for educational and research purposes only.
+
+---
+
+## ✍️ Author
+
+**Usman Daudu**  
+Data Scientist  
+📧 LinkedIn: [Usman Daudu](https://www.linkedin.com/in/usmanadaudu/)
+🔗 GitHub: [@usmanadaudu](https://github.com/usmanadaudu)
