@@ -165,7 +165,7 @@ while cap.isOpened():
                     
                 # Check for speech
                 lips_movement = (lms[15].y - lms[13].y) / abs(nose.z)
-                if lips_movement > 0.014:
+                if lips_movement > 0.017:
                     speech = "Talking"
                     anomaly = True
                 else:
