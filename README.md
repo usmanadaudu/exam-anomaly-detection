@@ -20,5 +20,50 @@ A light-weight proctoring system based on computer vision to detect anomalies du
 | Multiple face detection            | 👥❗   | Detects presence of more than one face        |
 | Alert system (future)              | 🚨🔔  | Trigger warnings on suspicious activity        |
 | Video recording/logging            | 🎥📝  | Record examination sessions for review         |
+| Web accessibility (future)         | 🌐🔗  |   Accessible through the web using either PC or smartphones          |
 
-## Installation
+---
+
+## ⚙️ Installation
+
+### 📦 Prerequisites
+
+Make sure you have Git and Python 3.7+ installed and set up.
+
+### 📥 Clone This Repository
+
+To get started with this project on your local machine, run:
+
+```bash
+git https://github.com/usmanadaudu/exam-anomaly-detection.git
+cd exam-anomaly-detection
+```
+
+### 🔧 Install Dependencies
+
+Install neccesary libraries
+
+```bash
+pip install -r requirements.txt
+```
+---
+
+## 💻 Usage
+
+```bash
+python main.py
+```
+
+---
+
+## 📤 Outputs
+
+### 🎥 Live video feed
+A real-time analyzed video feed will be displayed. The live feed will be a mirrored version of the footages.
+
+### 📹 Recorded footage
+The processed footages will be saved as a video named `processed_footage.mp4` in the main directory. The saved video will be a non-mirrored version.
+
+## 📊 Sample Output
+
+> ![Sample Output](Images/sample_output.jpg)
