@@ -31,7 +31,7 @@ MAX_WIDTH = 1280
 MAX_HEIGHT = 720
 
 # Webcam feed
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 ret, frame = cap.read()
 
