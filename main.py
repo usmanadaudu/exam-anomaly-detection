@@ -9,11 +9,11 @@ mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=5)
 
 # Load YOLOv4-tiny class names
-with open("coco.names", "r") as f:
+with open("YOLOv4-tiny/coco.names", "r") as f:
     class_names = [line.strip() for line in f.readlines()]
 
 # Load YOLOv4-tiny model
-net = cv2.dnn.readNet("yolov4-tiny.weights", "yolov4-tiny.cfg")
+net = cv2.dnn.readNet("YOLOv4-tiny/yolov4-tiny.weights", "YOLOv4-tiny/yolov4-tiny.cfg")
 
 # Use CPU
 # net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
