@@ -64,6 +64,8 @@ A real-time analyzed video feed will be displayed. The live feed will be a mirro
 ### 📹 Recorded footage
 The processed footages will be saved as a video named `processed_footage.mp4` in the main directory. The saved video will be a non-mirrored version.
 
+> ⚠️ Caution: Be sure to inform people when taking their footages and get permissions as neccesary.
+
 ### 📊 Sample Output
 
 > ![Sample Output](Images/sample_output.jpg)
@@ -81,4 +83,5 @@ This tool is a **proof of concept** and should not be considered a fully secure 
 **Usman Daudu**  
 Data Scientist  
 📧 LinkedIn: [Usman Daudu](https://www.linkedin.com/in/usmanadaudu/)
+
 🔗 GitHub: [@usmanadaudu](https://github.com/usmanadaudu)
