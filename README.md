@@ -62,7 +62,7 @@ python src/main.py
 A real-time analyzed video feed will be displayed. The live feed will be a mirrored version of the footages.
 
 ### 📹 Recorded footage
-The processed footages will be saved as a video named `processed_footage.mp4` in the main directory. The saved video will be a non-mirrored version.
+The processed footages will be saved as a video named `processed_footage.mp4` in the Output folder. The saved video will be a non-mirrored version.
 
 > ⚠️ Caution: Be sure to inform people when taking their footages and get permissions as neccesary.
 
