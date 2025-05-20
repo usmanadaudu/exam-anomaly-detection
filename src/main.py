@@ -57,7 +57,7 @@ if resize:
     # Get new frame shape
     h, w, _ = frame.shape
 
-# Create Outpur folder to contain recorded footage
+# Create Output folder to contain recorded footage
 if not os.path.exists("Output"):
     os.makedirs("Output")
 
