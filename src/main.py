@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -56,8 +57,12 @@ if resize:
     # Get new frame shape
     h, w, _ = frame.shape
 
+# Create Outpur folder to contain recorded footage
+if not os.path.exists("Output"):
+    os.makedirs("Output")
+
 # Initiate VideoWriter
-video_writer = cv2.VideoWriter("processed_footage.mp4", 
+video_writer = cv2.VideoWriter("Output/processed_footage.mp4", 
                                cv2.VideoWriter_fourcc(*"MP4V"),
                                10, (w, h))
 
