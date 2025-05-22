@@ -12,6 +12,7 @@ face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=5)
 # get directory for YOLO files
 file_path = os.path.realpath(__file__)
 src_dir = os.path.dirname(file_path)
+ouput_dir = src_dir.replace("src", "Output")
 yolo_dir = src_dir.replace("src", "YOLOv4-tiny")
 
 # Load YOLOv4-tiny class names
@@ -65,13 +66,14 @@ if resize:
     h, w, _ = frame.shape
 
 # Create Output folder to contain recorded footage
-if not os.path.exists("Output"):
-    os.makedirs("Output")
+if not os.path.exists(ouput_dir):
+    os.makedirs(ouput_dir)
 
 # Initiate VideoWriter
-video_writer = cv2.VideoWriter("Output/processed_footage.mp4", 
+video_writer = cv2.VideoWriter(os.path.join(ouput_dir, "processed_footage.mp4"), 
                                cv2.VideoWriter_fourcc(*"MP4V"),
-                               10, (w, h))
+                               10, (w, h)
+                              )
 
 while cap.isOpened():
     ret, frame = cap.read()
