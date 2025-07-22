@@ -85,3 +85,7 @@ Data Scientist
 📧 LinkedIn: [Usman Daudu](https://www.linkedin.com/in/usmanadaudu/)
 
 🔗 GitHub: [@usmanadaudu](https://github.com/usmanadaudu)
+
+## Alongside
+
+**Mr Adekunle Adejuwon**
